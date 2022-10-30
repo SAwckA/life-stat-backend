@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres
+    ports: 
+      - "5432:5432"
+
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_DB=testdb
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=qwerty
+
+  api:
+    build: .
+    command: bash -c "make run"
+
+    ports:
+      - "8000:8000"
+    
+    depends_on:
+      - db
+    restart: on-failure:10
