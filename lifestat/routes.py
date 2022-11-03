@@ -63,7 +63,7 @@ async def login(response: Response, credentials: LoginForm) -> Message:
             token, _ = JWTAccessToken.encode_token(JWTAccessToken.AccessPayload(username=user[1], id=user[2]))                    
     
             response.status_code = 200
-            response.set_cookie(key = "access_token", value = token)
+            response.set_cookie(key = "access_token", value = token, secure=True, httponly=True)
 
             return response
 
