@@ -5,15 +5,13 @@ from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import Response
-from starlette.templating import _TemplateResponse
-from pydantic import BaseModel
 
 from psycopg2.errors import UniqueViolation
 
 from lifestat.app import app, db
 from lifestat.dependencies import AccessTokenAuth
 from lifestat.jwt_tokens import JWTAccessToken
-from lifestat.schemes import Message, RegisterForm, LoginForm, HTTPError
+from lifestat.schemes import Message, RegisterForm, LoginForm, HTTPError, Data
 
 
 @app.get('/')
@@ -33,6 +31,10 @@ async def index(request: Request) -> HTMLResponse:
 async def register(credentials: RegisterForm) -> Message:
     sql = """insert into public.user(username, password) values
             (%s, %s);"""
+    
+    if len(credentials.username) <= 4:
+        return Message(message='username must be > 4', status_code=101)
+
     try:
         db.cur.execute(sql, (credentials.username, credentials.password, ))
         db.conn.commit()
@@ -51,13 +53,15 @@ async def register(credentials: RegisterForm) -> Message:
     })
 async def login(response: Response, credentials: LoginForm) -> Message:
     sql = """SELECT password, username, id FROM public.user WHERE username=%s"""
+    
     db.cur.execute(sql, (credentials.username,))
     user = db.cur.fetchone()
+    
     if user:
         if user[0] == credentials.password:
 
             token, _ = JWTAccessToken.encode_token(JWTAccessToken.AccessPayload(username=user[1], id=user[2]))                    
-            print(token)
+    
             response.status_code = 200
             response.set_cookie(key = "access_token", value = token)
 
@@ -73,17 +77,17 @@ async def login(response: Response, credentials: LoginForm) -> Message:
     }
 )
 async def protected_method(credentials: AccessTokenAuth = Depends(AccessTokenAuth)) -> Message:
-    print(credentials.user)
-    
+
     return Message(message=credentials.user.username)
     
 
 @app.get('/allCounters')
 async def get_all_counters(credentials: AccessTokenAuth = Depends(AccessTokenAuth)):
     sql = "SELECT all_counters FROM public.user WHERE id=%s"
+
     db.cur.execute(sql, (credentials.user.id, ))
     counters = db.cur.fetchone()
-    print(counters)
+
     return counters[0]
 
 
@@ -95,3 +99,31 @@ async def save_all_counters(counters: list, credentials: AccessTokenAuth = Depen
     db.conn.commit()
 
     return Message(message="success")
+
+
+@app.get('/theme')
+async def get_theme(credentials: AccessTokenAuth = Depends(AccessTokenAuth)) -> dict:
+    sql = """SELECT theme FROM public.user WHERE id=%s"""
+    
+    db.cur.execute(sql, (credentials.user.id, ))
+    theme = db.cur.fetchone()
+
+    return theme[0]
+
+
+@app.post('/saveTheme')
+async def save_theme(theme: dict, credentials: AccessTokenAuth = Depends(AccessTokenAuth)) -> Message:
+    sql = """UPDATE public.user SET theme=%s WHERE id=%s"""
+
+    db.cur.execute(sql, (json.dumps(theme), credentials.user.id))
+    db.conn.commit()
+
+    return Message(message="success", status_code=0)
+
+
+@app.get('/user')
+async def get_user(credentials: AccessTokenAuth = Depends(AccessTokenAuth)) -> Message:
+    
+    return Message(status_code=0, message=credentials.user.username)
+
+    

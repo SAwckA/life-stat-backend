@@ -10,7 +10,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY Makefile .
 
-COPY database_scheme database_scheme
 COPY lifestat lifestat
 COPY settings settings
 
