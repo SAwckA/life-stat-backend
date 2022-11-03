@@ -2,31 +2,35 @@ import logging
 import os
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import Response
+from fastapi.requests import Request
 
 from lifestat.database import Database
+
 
 app = FastAPI()
 db = Database(user="testuser", password="qwerty", db="testdb", host="db")
 
 
-
-# def setup_logging() -> None:
-#     file_handler = logging.FileHandler(os.getenv('LOG_PATH', 'russky.log'))
-#     file_handler.setFormatter(ecs_logging.StdlibFormatter())
-#     console_handler = logging.StreamHandler()
-#     console_handler.setFormatter(
-#         logging.Formatter(
-#             os.getenv(
-#                 'LOF_FORMAT',
-#                 '%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s',
-#             )
-#         )
-#     )
-#     logging.basicConfig(
-#         level=logging.INFO,
-#         handlers=[file_handler, console_handler],
-#     )
+@app.middleware('http')
+async def options_plug(request: Request, call_next):
+    if request.method == "OPTIONS":
+        response = Response()
+        response.headers['Access-Control-Allow-Origin'] = 'http://0.0.0.0:5173'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, GET, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type'
+        response.status_code = 204
+        return response
+    
+    response = await call_next(request)
+    
+    response.headers['Access-Control-Allow-Origin'] = 'http://0.0.0.0:5173'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    response.headers['Access-Control-Allow-Methods'] = 'POST, GET, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type'
+    
+    return response
 
 
 import lifestat.routes  # noqa # for
