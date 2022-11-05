@@ -14,3 +14,6 @@ COPY lifestat lifestat
 COPY settings settings
 COPY init_test.sql .
 
+EXPOSE 8000
+
+CMD [ "make" , "run" ]
