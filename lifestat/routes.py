@@ -16,6 +16,11 @@ async def index(request: Request) -> HTMLResponse:
     return "`213"
 
 
+@app.get('/health')
+async def health_check(request: Request):
+    return 'OK'
+
+
 @app.post('/register', responses={
     200: {
             "model": Message
