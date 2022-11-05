@@ -5,11 +5,11 @@ from fastapi import FastAPI
 from fastapi.responses import Response
 from fastapi.requests import Request
 
-from lifestat.database import Database
+from lifestat.database import database_class
 
 
 app = FastAPI()
-db = Database(user="testuser", password="qwerty", db="testdb", host="db")
+db = database_class()
 
 
 @app.middleware('http')

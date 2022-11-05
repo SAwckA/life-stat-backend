@@ -21,6 +21,15 @@ services:
     ports:
       - "8000:8000"
     
+    environment:
+      - DB_PASS=qwerty
+      - DB_USER=testuser
+      - DB_HOST=db
+      - DB_NAME=testdb
+      - DB_PORT=5432
+      - DB_ENV=PROD
+      - SECRET_KEY=,mwleb;rtjklcwernjtkl3ihcnjkthwjebvj234hiugyvcb5j2345
+
     depends_on:
       - db
     restart: on-failure:10

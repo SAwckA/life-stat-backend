@@ -12,6 +12,5 @@ COPY Makefile .
 
 COPY lifestat lifestat
 COPY settings settings
-
-
+COPY init_test.sql .
 

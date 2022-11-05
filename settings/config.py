@@ -1,17 +1,18 @@
 import os
 from datetime import timedelta
 from pydantic import BaseModel
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
 
 DB_PASS = os.environ.get("DB_PASS")
 DB_USER = os.environ.get("DB_USER")
 DB_HOST = os.environ.get("DB_HOST")
 DB_NAME = os.environ.get("DB_NAME")
 DB_ENV = os.environ.get("DB_ENV")
-
-CONFIG_DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
-TEST_DATABASE_URL = "sqlite:///db.sqlite"
-if DB_ENV == "TEST":
-    CONFIG_DATABASE_URL = TEST_DATABASE_URL
+DB_PORT = os.environ.get("DB_PORT")
 
 
 SECRET_KEY = os.environ.get('SECRET_KEY')

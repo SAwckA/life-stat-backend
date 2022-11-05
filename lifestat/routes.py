@@ -1,12 +1,9 @@
-import logging
 import json
 
 from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import Response
-
-from psycopg2.errors import UniqueViolation
 
 from lifestat.app import app, db
 from lifestat.dependencies import AccessTokenAuth
@@ -36,10 +33,9 @@ async def register(credentials: RegisterForm) -> Message:
         return Message(message='username must be > 4', status_code=101)
 
     try:
-        db.cur.execute(sql, (credentials.username, credentials.password, ))
-        db.conn.commit()
+        db.exec_commit(sql, [credentials.username, credentials.password])
 
-    except UniqueViolation:
+    except db.unique_exception:
         db.conn.rollback()
         raise HTTPException(status_code=409, detail="username already exist")
 
@@ -54,9 +50,11 @@ async def register(credentials: RegisterForm) -> Message:
 async def login(response: Response, credentials: LoginForm) -> Message:
     sql = """SELECT password, username, id FROM public.user WHERE username=%s"""
     
-    db.cur.execute(sql, (credentials.username,))
-    user = db.cur.fetchone()
+    # db.cur.execute(sql, (credentials.username,))
+    # user = db.cur.fetchone()
     
+    user = db.fetchone(sql, [credentials.username])
+    print(user)
     if user:
         if user[0] == credentials.password:
 
@@ -85,18 +83,28 @@ async def protected_method(credentials: AccessTokenAuth = Depends(AccessTokenAut
 async def get_all_counters(credentials: AccessTokenAuth = Depends(AccessTokenAuth)):
     sql = "SELECT all_counters FROM public.user WHERE id=%s"
 
-    db.cur.execute(sql, (credentials.user.id, ))
-    counters = db.cur.fetchone()
+    # db.cur.execute(sql, (credentials.user.id, ))
+    # counters = db.cur.fetchone()
 
-    return counters[0]
+    counters = db.fetchone(sql, [credentials.user.id])
+    print(counters)
+    if counters:
+        if counters[0] != [] or counters[0] != "[]":
+            if isinstance(counters[0], str):
+                counters = json.loads(counters[0])
+                return counters
+            return counters[0]
+    return [None,]
 
 
 @app.post('/saveCounters')
 async def save_all_counters(counters: list, credentials: AccessTokenAuth = Depends(AccessTokenAuth)) -> Message:
     sql = """UPDATE public.user SET all_counters=%s WHERE id=%s"""
 
-    db.cur.execute(sql, (json.dumps(counters), credentials.user.id))
-    db.conn.commit()
+    # db.cur.execute(sql, (json.dumps(counters), credentials.user.id))
+    # db.conn.commit()
+
+    db.exec_commit(sql, [json.dumps(counters), credentials.user.id])
 
     return Message(message="success")
 
@@ -105,18 +113,27 @@ async def save_all_counters(counters: list, credentials: AccessTokenAuth = Depen
 async def get_theme(credentials: AccessTokenAuth = Depends(AccessTokenAuth)) -> dict:
     sql = """SELECT theme FROM public.user WHERE id=%s"""
     
-    db.cur.execute(sql, (credentials.user.id, ))
-    theme = db.cur.fetchone()
-
-    return theme[0]
+    # db.cur.execute(sql, (credentials.user.id, ))
+    # theme = db.cur.fetchone()
+    theme = db.fetchone(sql, [credentials.user.id])
+    print(theme)
+    if theme:
+        if theme[0] != [] or theme[0] != "[]":
+            if isinstance(theme[0], str):
+                theme = json.loads(theme[0])
+                return theme
+            return theme[0]
+    return [None,]
 
 
 @app.post('/saveTheme')
 async def save_theme(theme: dict, credentials: AccessTokenAuth = Depends(AccessTokenAuth)) -> Message:
     sql = """UPDATE public.user SET theme=%s WHERE id=%s"""
 
-    db.cur.execute(sql, (json.dumps(theme), credentials.user.id))
-    db.conn.commit()
+    # db.cur.execute(sql, (json.dumps(theme), credentials.user.id))
+    # db.conn.commit()
+
+    db.exec_commit(sql, [json.dumps(theme), credentials.user.id])
 
     return Message(message="success", status_code=0)
 

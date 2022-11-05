@@ -14,7 +14,9 @@ from lifestat.schemes import Message
 import settings.config
 
 
-SECRET_KEY = "mkjhgfcfvghbjn,k.bjvhcgxfdfgkl;oiuiytuyrerswertyuytrty6543456787654q23rtyjku5432we"
+SECRET_KEY = settings.config.SECRET_KEY
+if len(SECRET_KEY) <= 1: 
+    SECRET_KEY = "mkjhgfcfvghbjn,k.bjvhcgxfdfgkl;oiuiytuyrerswertyuytrty6543456787654q23rtyjku5432we"
 
 
 class TokensPair(BaseModel):
