@@ -11,15 +11,26 @@ class Database:
     unique_exception = UniqueViolation
 
     def __init__(self):
-        self.conn = psycopg2.connect(
-            dbname=cfg.DB_NAME, 
-            user=cfg.DB_USER, 
-            password=cfg.DB_PASS, 
-            host=cfg.DB_HOST, 
-            port=cfg.DB_PORT,
-            target_session_attrs="read-write",
-            sslmode="verify-full"
-            )
+        # self.conn = psycopg2.connect(
+        #     dbname=cfg.DB_NAME, 
+        #     user=cfg.DB_USER, 
+        #     password=cfg.DB_PASS, 
+        #     # host=cfg.DB_HOST, 
+        #     host = "rc1a-u4mzdexiwhm9uylx.mdb.yandexcloud.net",
+        #     port=cfg.DB_PORT,
+        #     target_session_attrs="read-write",
+        #     sslmode="verify-full"
+        #     )
+        
+        self.conn = psycopg2.connect(f"""
+                host={cfg.DB_HOST}
+                port={cfg.DB_PORT}
+                dbname={cfg.DB_NAME}
+                user={cfg.DB_USER}
+                password={cfg.DB_PASS}
+                target_session_attrs=read-write
+                sslmode=verify-full
+            """)
         
         self.cur = self.conn.cursor()
 
