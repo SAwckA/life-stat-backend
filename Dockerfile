@@ -14,7 +14,7 @@ COPY lifestat lifestat
 COPY settings settings
 COPY init_test.sql .
 RUN mkdir ~/.postgresql
-COPY root.crt ~/.postgresql/root.crt
+COPY root.crt root/.postgresql/root.crt
 
 EXPOSE 8000
 
