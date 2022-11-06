@@ -13,7 +13,12 @@ from lifestat.schemes import Message, RegisterForm, LoginForm, HTTPError, Data
 
 @app.get('/')
 async def index(request: Request) -> HTMLResponse:
-    return "`213"
+    return "OK"
+
+
+@app.get('/health')
+async def health_check(request: Request):
+    return 'OK'
 
 
 @app.post('/register', responses={
