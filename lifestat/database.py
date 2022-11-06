@@ -86,7 +86,7 @@ class TempDatabase:
         self.conn.close()
         
 
-if cfg.DB_ENV == "DEV":
+if cfg.DB_ENV != "PROD":
     print("[WARN] USING MEMORY DATABASE")
     database_class = TempDatabase
     
