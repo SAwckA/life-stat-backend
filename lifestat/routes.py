@@ -59,7 +59,7 @@ async def login(response: Response, credentials: LoginForm) -> Message:
     # user = db.cur.fetchone()
     
     user = db.fetchone(sql, [credentials.username])
-    print(user)
+    
     if user:
         if user[0] == credentials.password:
 
@@ -92,7 +92,7 @@ async def get_all_counters(credentials: AccessTokenAuth = Depends(AccessTokenAut
     # counters = db.cur.fetchone()
 
     counters = db.fetchone(sql, [credentials.user.id])
-    print(counters)
+    
     if counters:
         if counters[0] != [] or counters[0] != "[]":
             if isinstance(counters[0], str):
@@ -121,7 +121,7 @@ async def get_theme(credentials: AccessTokenAuth = Depends(AccessTokenAuth)) -> 
     # db.cur.execute(sql, (credentials.user.id, ))
     # theme = db.cur.fetchone()
     theme = db.fetchone(sql, [credentials.user.id])
-    print(theme)
+    
     if theme:
         if theme[0] != [] or theme[0] != "[]":
             if isinstance(theme[0], str):

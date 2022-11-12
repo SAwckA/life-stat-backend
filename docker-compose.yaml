@@ -29,7 +29,10 @@ services:
       - DB_PORT=5432
       - DB_ENV=PROD
       - SECRET_KEY=,mwleb;rtjklcwernjtkl3ihcnjkthwjebvj234hiugyvcb5j2345
-
+      - ELASTIC_APM_SERVICE_NAME=
+      - ELASTIC_APM_SERVER_URL=
+      - ELASTIC_APM_ENVIRONMENT=
+      - ELASTIC_APM_SERVICE_VERSION=1.0
     depends_on:
       - db
     restart: on-failure:10

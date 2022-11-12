@@ -53,9 +53,17 @@ class TempDatabase:
         self.conn = sqlite3.connect("file::memory:?cache=shared")
         self.cur = self.conn.cursor()
         self.init_structure()
+        self.init_data()
         
     def init_structure(self) -> None:
         with open("./init_test.sql") as sql_file:
+            sql_script = sql_file.read()
+            
+        self.cur.executescript(sql_script)    
+        self.conn.commit()
+        
+    def init_data(self) -> None:
+        with open("./data_test.sql") as sql_file:
             sql_script = sql_file.read()
             
         self.cur.executescript(sql_script)    

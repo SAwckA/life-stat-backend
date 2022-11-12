@@ -5,6 +5,16 @@ from fastapi import FastAPI
 from fastapi.responses import Response
 from fastapi.requests import Request
 
+from elasticapm.contrib.starlette import ElasticAPM, make_apm_client
+
+def setup_tracing() -> None:
+    if not os.getenv('ELASTIC_APM_SERVICE_NAME'):
+        return
+
+    apm = make_apm_client()
+    app.add_middleware(ElasticAPM, client=apm)
+
+
 from lifestat.database import database_class
 
 
@@ -32,5 +42,5 @@ async def options_plug(request: Request, call_next):
     
     return response
 
-
+setup_tracing()
 import lifestat.routes  # noqa # for
