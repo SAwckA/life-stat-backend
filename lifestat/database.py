@@ -25,20 +25,58 @@ class Database:
         self.cur = self.conn.cursor()
 
     def query(self, query):
-        self.cur.execute(query)
+        try:
+            self.cur.execute(query)
+        except psycopg2.InterfaceError:
+            self.reinitiate()
         
     def exec_commit(self, sql: str, args: list):
-        self.cur.execute(sql, args)
-        self.conn.commit()
+        try:
+            self.cur.execute(sql, args)
+            self.conn.commit()
+        except psycopg2.InterfaceError:
+            self.reinitiate()
         
     def fetchall(self, sql: str, args: list) -> list:
-        self.cur.execute(sql, args)
-        return self.cur.fetchall()
+        try:
+            self.cur.execute(sql, args)
+            return self.cur.fetchall()
+        
+        except psycopg2.InterfaceError:
+            self.reinitiate()
+            
+            self.cur.execute(sql, args)
+            return self.cur.fetchall()
 
     def fetchone(self, sql: str, args: list) -> list:
-        self.cur.execute(sql, args)
-        return self.cur.fetchone()
+        try:
+            self.cur.execute(sql, args)
+            return self.cur.fetchone()
+        
+        except psycopg2.InterfaceError:
+            self.reinitiate()
+            
+            self.cur.execute(sql, args)
+            return self.cur.fetchone()
 
+    def reinitiate(self):
+        try:
+            self.close()
+        except:
+            ...
+        self.conn = psycopg2.connect(f"""
+                host={cfg.DB_HOST}
+                port={cfg.DB_PORT}
+                dbname={cfg.DB_NAME}
+                user={cfg.DB_USER}
+                password={cfg.DB_PASS}
+                target_session_attrs=read-write
+                sslmode=verify-full
+            """)
+
+        self.cur = self.conn.cursor()
+        
+        
     def close(self):
         self.cur.close()
         self.conn.close()
