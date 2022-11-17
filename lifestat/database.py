@@ -27,14 +27,14 @@ class Database:
     def query(self, query):
         try:
             self.cur.execute(query)
-        except psycopg2.InterfaceError:
+        except psycopg2.InterfaceError or psycopg2.OperationalError:
             self.reinitiate()
         
     def exec_commit(self, sql: str, args: list):
         try:
             self.cur.execute(sql, args)
             self.conn.commit()
-        except psycopg2.InterfaceError:
+        except psycopg2.InterfaceError or psycopg2.OperationalError:
             self.reinitiate()
         
     def fetchall(self, sql: str, args: list) -> list:
@@ -42,7 +42,7 @@ class Database:
             self.cur.execute(sql, args)
             return self.cur.fetchall()
         
-        except psycopg2.InterfaceError:
+        except psycopg2.InterfaceError or psycopg2.OperationalError:
             self.reinitiate()
             
             self.cur.execute(sql, args)
@@ -53,7 +53,7 @@ class Database:
             self.cur.execute(sql, args)
             return self.cur.fetchone()
         
-        except psycopg2.InterfaceError:
+        except psycopg2.InterfaceError or psycopg2.OperationalError:
             self.reinitiate()
             
             self.cur.execute(sql, args)

@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
@@ -66,7 +67,7 @@ async def login(response: Response, credentials: LoginForm) -> Message:
             token, _ = JWTAccessToken.encode_token(JWTAccessToken.AccessPayload(username=user[1], id=user[2]))                    
     
             response.status_code = 200
-            response.set_cookie(key = "access_token", value = token, httponly=True)
+            response.set_cookie(key = "access_token", value = token, httponly=True, expires=2629743)
 
             return response
 
