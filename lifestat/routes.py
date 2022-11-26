@@ -11,6 +11,7 @@ from lifestat.dependencies import AccessTokenAuth
 from lifestat.jwt_tokens import JWTAccessToken
 from lifestat.schemes import Message, RegisterForm, LoginForm, HTTPError, Data
 
+from lifestat.utils.hash_algs import create_password, check_password
 
 @app.get('/')
 async def index(request: Request) -> HTMLResponse:
@@ -39,7 +40,7 @@ async def register(credentials: RegisterForm) -> Message:
         return Message(message='username must be > 4', status_code=101)
 
     try:
-        db.exec_commit(sql, [credentials.username, credentials.password])
+        db.exec_commit(sql, [credentials.username, create_password(credentials.password)])
 
     except db.unique_exception:
         db.conn.rollback()
@@ -62,7 +63,7 @@ async def login(response: Response, credentials: LoginForm) -> Message:
     user = db.fetchone(sql, [credentials.username])
     
     if user:
-        if user[0] == credentials.password:
+        if check_password(credentials.password, user[0] ):
 
             token, _ = JWTAccessToken.encode_token(JWTAccessToken.AccessPayload(username=user[1], id=user[2]))                    
     
