@@ -12,6 +12,7 @@ DB_USER = os.environ.get("DB_USER")
 DB_HOST = os.environ.get("DB_HOST")
 DB_NAME = os.environ.get("DB_NAME")
 DB_ENV = os.environ.get("DB_ENV")
+DB_SSL = os.environ.get("DB_SSL")
 DB_PORT = os.environ.get("DB_PORT")
 
 

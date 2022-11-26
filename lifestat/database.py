@@ -19,7 +19,7 @@ class Database:
                 user={cfg.DB_USER}
                 password={cfg.DB_PASS}
                 target_session_attrs=read-write
-                sslmode=verify-full
+                sslmode={cfg.DB_SSL}
             """)
         
         self.cur = self.conn.cursor()
@@ -71,7 +71,7 @@ class Database:
                 user={cfg.DB_USER}
                 password={cfg.DB_PASS}
                 target_session_attrs=read-write
-                sslmode=verify-full
+                sslmode={cfg.DB_PASS}
             """)
 
         self.cur = self.conn.cursor()
