@@ -19,13 +19,13 @@
 ```bash
 # Загрузка репозитория не требуется 
 
-docker run -d --rm --name api \
+sudo docker run -d --rm --name api \
   -p "8000:8000" \
   -e DB_ENV=DEV -e \
   SECRET_KEY=asdqwezxc \
   ghcr.io/sawcka/life-stat-backend:release 
 
-docker run -d \
+sudo docker run -d \
   --rm --name watchtower \
   -v $HOME/.docker/config.json:/config.json \
   -v /var/run/docker.sock:/var/run/docker.sock \
